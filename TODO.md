@@ -7,11 +7,17 @@ depth beats coverage.
 
 ---
 
-## Phase 0 — Foundations & mental model
-- [ ] **Why Next.js exists** — the gap CRA leaves: no SSR, no routing, no bundler control. SSR vs SSG vs ISR vs CSR as a spectrum, not four separate things.
-- [ ] **App Router vs Pages Router** — learn App Router (the v15 default). Know Pages Router exists so old tutorials don't confuse you.
-- [ ] **React Server Components (RSC) model** — *the* concept that makes Next v15 click. Code runs on the server by default and never ships to the browser. Everything else is a consequence of this.
-- [ ] **Turbopack** — the new default dev bundler (replaces the Webpack CRA hides). What it does and its current limits.
+## Phase 0 — Foundations & mental model ✅
+- [x] **Why Next.js exists** — the gap CRA leaves: no SSR, no routing, no bundler control. SSR vs SSG vs ISR vs CSR as a spectrum, not four separate things.
+- [x] **App Router vs Pages Router** — learn App Router (the v15 default). Know Pages Router exists so old tutorials don't confuse you.
+- [x] **React Server Components (RSC) model** — *the* concept that makes Next v15 click. Code runs on the server by default and never ships to the browser. Everything else is a consequence of this.
+- [x] **Turbopack** — the new default dev bundler (replaces the Webpack CRA hides). What it does and its current limits.
+
+> **Phase 0 takeaways:** Server Components run once on the server → zero JS shipped.
+> Client APIs (`useState`, `onClick`) need `"use client"`, which ships + hydrates that
+> subtree, so push the boundary *down* to the smallest interactive leaf. Meta/SEO works
+> in Next because HTML is generated per-route on the *server* (in the first byte crawlers
+> read); CRA's meta is client-side/post-JS, so bots miss it.
 
 ## Phase 1 — Project setup & migration mechanics
 - [ ] **`create-next-app` & project structure** — scaffold a fresh Next 15 app; compare its layout to this CRA `src/`.
