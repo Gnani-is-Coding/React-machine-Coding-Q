@@ -5,13 +5,11 @@ Create React App project to the App Router. Ordered so each topic builds on the
 last. Work one vertical slice (a single route, end-to-end) before moving on —
 depth beats coverage.
 
+> Practice question backlog lives in [MACHINE-CODING-TODO.md](./MACHINE-CODING-TODO.md).
+
 ---
 
 ## Phase 0 — Foundations & mental model ✅
-- [x] **Why Next.js exists** — the gap CRA leaves: no SSR, no routing, no bundler control. SSR vs SSG vs ISR vs CSR as a spectrum, not four separate things.
-- [x] **App Router vs Pages Router** — learn App Router (the v15 default). Know Pages Router exists so old tutorials don't confuse you.
-- [x] **React Server Components (RSC) model** — *the* concept that makes Next v15 click. Code runs on the server by default and never ships to the browser. Everything else is a consequence of this.
-- [x] **Turbopack** — the new default dev bundler (replaces the Webpack CRA hides). What it does and its current limits.
 
 > **Phase 0 takeaways:** Server Components run once on the server → zero JS shipped.
 > Client APIs (`useState`, `onClick`) need `"use client"`, which ships + hydrates that
@@ -19,17 +17,10 @@ depth beats coverage.
 > in Next because HTML is generated per-route on the *server* (in the first byte crawlers
 > read); CRA's meta is client-side/post-JS, so bots miss it.
 
-## Phase 1 — Project setup & migration mechanics
-- [ ] **`create-next-app` & project structure** — scaffold a fresh Next 15 app; compare its layout to this CRA `src/`.
-- [ ] **Migrating CRA → Next** — move components in, drop `react-scripts`, `index.html` → `app/layout.tsx`, `public/` handling, env var rename (`REACT_APP_*` → `NEXT_PUBLIC_*`).
-- [ ] **`next.config.js`** — the config CRA abstracted away. The knobs you'll actually touch.
-- [ ] **TypeScript, ESLint & path aliases** — Next's built-in setup vs the CRA config.
+## Phase 1 — Project setup & migration mechanics ✅
 
 ## Phase 2 — Routing (the App Router core)
-- [ ] **File-based routing** — folders = routes, `page.tsx` = the page. Contrast with the current client-side router.
-- [ ] **`layout.tsx` & nested layouts** — shared UI that persists across navigation (app shell / nav).
-- [ ] **Dynamic routes** — `[id]`, `[...slug]`, `[[...optional]]`. Map the interview-question detail pages onto this.
-- [ ] **Route groups `(group)`, `loading.tsx`, `error.tsx`, `not-found.tsx`** — built-in loading/error boundaries per segment.
+- [x] **Dynamic routes** — `[id]`, `[...slug]`, `[[...optional]]`. Map the interview-question detail pages onto this.
 - [ ] **`<Link>`, `useRouter`, `usePathname`, `useSearchParams`** — navigation and prefetching.
 - [ ] **⚠️ v15 breaking change: `params` & `searchParams` are async (Promises)** — you must `await` them. Trips up everyone migrating.
 
@@ -99,3 +90,54 @@ Four kinds of state; pick the tool per problem, not per habit:
 **Priority:** Phases 2–4 are 70% of the value. Server/Client Components and the
 caching model are where real understanding lives. Migrate one route end-to-end
 (route → layout → server fetch → a client island) before moving on.
+
+---
+
+## 📌 Resume here (next session)
+
+**Current state**
+- Branch: `feat/migrate-to-nextjs-15` · Next **15.5.20** (pinned) · React 19.2.4 · Tailwind v4 · bun · Node **24.8.0** (nvm default)
+- Phase 0 ✅ done & committed (`f6a521f`). Dev server boots green (`bun run dev` → http://localhost:3000).
+- Old CRA project preserved in **`(deprecated)/`** — 5 machine-coding components: `Home`, `InfiniteScroll`, `AutoCompleteSearchResults`, `Timer`, `JiraBoard`. CRA routing was `react-router-dom` in `(deprecated)/src/App.js`.
+
+**Where we stopped:** Phase 1, about to do the **first migration — the Timer** (chosen because it's fully interactive → teaches the `"use client"` boundary + file-routing).
+
+**Key lesson to apply:** App Router has **no react-router-dom**. The folder tree *is* the router.
+
+| CRA | App Router |
+|---|---|
+| `index.js` (`createRoot` + `<BrowserRouter>`) | `app/layout.tsx` (exists) |
+| `App.js` `<Routes>` | the `app/` folder tree |
+| `<Route path="/timer" Component={Timer}/>` | `app/timer/page.tsx` |
+| `Timer` (hooks + onClick) | same code **+ `"use client"`**, `.jsx`→`.tsx` |
+
+**Next action:** create `app/timer/page.tsx` (target code below), run `bun run dev`, visit `/timer`.
+Decision left open: type it myself (best retention) vs. have Claude scaffold it.
+
+```tsx
+"use client";                    // interactive → opt into the browser
+import { useEffect, useRef, useState } from "react";
+
+export default function TimerPage() {          // default export = the route
+  const [timeVal, setTimeVal] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);  // typed for TS
+
+  useEffect(() => {
+    if (isRunning) {
+      timerId.current = setTimeout(() => setTimeVal((t) => t + 1), 1000);
+    }
+    return () => { if (timerId.current) clearTimeout(timerId.current); };
+  }, [isRunning, timeVal]);
+
+  return (
+    <div>
+      <p>Timer value: {timeVal}</p>
+      {!isRunning && <button onClick={() => setIsRunning(true)}>Start</button>}
+      {isRunning && <button onClick={() => setIsRunning(false)}>Stop</button>}
+    </div>
+  );
+}
+```
+
+**Then:** migrate the remaining 4 routes (each a folder under `app/`), keeping non-interactive shells as Server Components and pushing `"use client"` down to interactive leaves. Continue Phase 1 → Phase 2.
