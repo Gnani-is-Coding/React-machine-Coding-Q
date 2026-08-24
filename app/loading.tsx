@@ -20,6 +20,7 @@ export default function Loading(): React.ReactElement {
         </div>
       </div>
       <span className="sr-only">Loading…</span>
+      {/* https://claude.ai/code/artifact/017d0fd6-bb6b-4647-89a2-f706708e66f8 */}
     </div>
   )
 }

@@ -9,7 +9,7 @@ interface ErrorProps {
 
 export default function Error({ error, reset }: ErrorProps): React.ReactElement {
   useEffect(() => {
-    console.error(error)
+    console.error(error, "ERROR ::::")
   }, [error])
 
   return (
